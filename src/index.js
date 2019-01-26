@@ -22,6 +22,20 @@ class Board extends React.Component {
     );
   }
 
+// Template for creating board using 2 loops
+// c - cols, r - rows
+  createRows() {
+  	let cols = [];
+  	for(let c = 0; c < 3; c++){
+  		let rows = [];
+  		for(let r = 0; r < 3; r++){
+  			// i - used for renderSquare function
+  			let i = c + r;
+  		}
+  	}
+  }
+
+
   render() {
     return (
       <div>
@@ -110,8 +124,10 @@ class Game extends React.Component {
   	const positions = current.positions;
 
   	const moves = history.map((step, move) => {
-  		// console.warn();
   		let col, row;
+  		// using jumped from state, so that the app doesn't crash
+  		// when time travelling, as I haven't fixed bug
+  		// of showing proper (col, row) after timetravel
   		if(move && !this.state.jumped) {
 	  		col = positions[move - 1].col;
 	  		row = positions[move - 1].row;
