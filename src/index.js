@@ -55,6 +55,7 @@ class Game extends React.Component {
 			}],
 			stepNumber: 0,
 			xIsNext: true,
+			jumped: false,
 		}
 	}
 
@@ -86,10 +87,16 @@ class Game extends React.Component {
   }
 
   jumpTo(step) {
+  	const length = this.state.history.length;
+  	for(let i = 0; i < length; i++){
+  		document.getElementById(i).style.fontWeight = "normal";
+  	}
   	this.setState({
   		stepNumber: step,
   		xIsNext: (step % 2) === 0,
+  		jumped: true,
   	});
+  	document.getElementById(step).style.fontWeight = "bold";
   }
 
   render() {
@@ -101,7 +108,7 @@ class Game extends React.Component {
   	const moves = history.map((step, move) => {
   		// console.warn();
   		let col, row;
-  		if(move) {
+  		if(move && !this.state.jumped) {
 	  		col = positions[move - 1].col;
 	  		row = positions[move - 1].row;
 	  	}
@@ -114,7 +121,7 @@ class Game extends React.Component {
   			'Go to game start';
   			return (
   				<li key={move}>
-  					<button onClick={() => this.jumpTo(move)}>{desc}</button>
+  					<button id={move} onClick={() => this.jumpTo(move)}>{desc}</button>
   				</li>
   			);
 
