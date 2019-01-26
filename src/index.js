@@ -55,7 +55,6 @@ class Game extends React.Component {
 			}],
 			stepNumber: 0,
 			xIsNext: true,
-			jumped: false,
 		}
 	}
 
@@ -71,12 +70,15 @@ class Game extends React.Component {
   	let col = (i % 3) + 1;
   	let row = Math.ceil((i+1.0)/3);
   	console.log("TEST: col: " + col + " and row: " + row);
-  	positions[this.state.stepNumber] = {col: col,
-  									row: row,}
+  	positions[history.length - 1] = {col: col,
+  									row: row,};
+  	console.log("History Length: " + history.length);
+  	console.log("Col: " + positions[history.length - 1].col);
+  	console.log("Row: " + positions[history.length - 1].row);
   	this.setState({
   		history: history.concat([{
   			squares: squares,
-  			positions: positions
+  			positions: positions,
   		}]),
   		stepNumber: history.length,
   		xIsNext: !this.state.xIsNext,
@@ -87,7 +89,6 @@ class Game extends React.Component {
   	this.setState({
   		stepNumber: step,
   		xIsNext: (step % 2) === 0,
-  		jumped: true,
   	});
   }
 
@@ -97,11 +98,19 @@ class Game extends React.Component {
   	const winner  = calculateWinner(current.squares);
   	const positions = current.positions;
 
-
-
   	const moves = history.map((step, move) => {
+  		// console.warn();
+  		let col, row;
+  		if(move) {
+	  		col = positions[move - 1].col;
+	  		row = positions[move - 1].row;
+	  	}
+	  	else{
+	  		col = 0;
+	  		row = 0;
+	  	}
   		const desc = move ?
-  			'Go to move #' + move :
+  			'Go to move #' + move + " at (" + col + "," + row + ")" :
   			'Go to game start';
   			return (
   				<li key={move}>
