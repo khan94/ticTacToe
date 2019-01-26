@@ -84,6 +84,10 @@ class Game extends React.Component {
   		stepNumber: history.length,
   		xIsNext: !this.state.xIsNext,
    	});
+   	const length = this.state.history.length;
+  	for(let i = 0; i < length; i++){
+  		document.getElementById(i).style.fontWeight = "normal";
+  	}
   }
 
   jumpTo(step) {
