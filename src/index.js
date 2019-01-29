@@ -18,6 +18,7 @@ class Board extends React.Component {
     	<Square 
     		value={this.props.squares[i]}
     		onClick={() => this.props.onClick(i)}
+    		key={i}
     	/>
     );
   }
@@ -25,36 +26,31 @@ class Board extends React.Component {
 // Template for creating board using 2 loops
 // c - cols, r - rows
   createRows() {
+  	let counter = 0;
   	let cols = [];
   	for(let c = 0; c < 3; c++){
   		let rows = [];
   		for(let r = 0; r < 3; r++){
   			// i - used for renderSquare function
-  			let i = c + r;
+  			let i = 3*c + r;
+  			rows.push(this.renderSquare(i));
+  			counter++;
   		}
+  		cols.push(rows);
   	}
+  	return (
+  		<div>
+  			{cols.map(function(col, index){
+  					return <div className="board-row" key={index}>{col}</div>;
+  			})}
+  		</div>
+  	)
   }
 
 
   render() {
     return (
-      <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
-      </div>
+      this.createRows()
     );
   }
 }
