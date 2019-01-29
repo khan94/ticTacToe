@@ -26,7 +26,6 @@ class Board extends React.Component {
 // Template for creating board using 2 loops
 // c - cols, r - rows
   createRows() {
-  	let counter = 0;
   	let cols = [];
   	for(let c = 0; c < 3; c++){
   		let rows = [];
@@ -34,7 +33,6 @@ class Board extends React.Component {
   			// i - used for renderSquare function
   			let i = 3*c + r;
   			rows.push(this.renderSquare(i));
-  			counter++;
   		}
   		cols.push(rows);
   	}
@@ -66,6 +64,7 @@ class Game extends React.Component {
 			stepNumber: 0,
 			xIsNext: true,
 			jumped: false,
+			ascending: true,
 		}
 	}
 
@@ -118,7 +117,6 @@ class Game extends React.Component {
   	const current = history[this.state.stepNumber];
   	const winner  = calculateWinner(current.squares);
   	const positions = current.positions;
-
   	const moves = history.map((step, move) => {
   		let col, row;
   		// using jumped from state, so that the app doesn't crash
@@ -163,6 +161,9 @@ class Game extends React.Component {
         <div className="game-info">
           <div>{status}</div>
           <ol>{moves}</ol>
+          <button onClick={() => this.setState({ascending: !this.state.ascending,})}>
+          	Change order
+          </button>
         </div>
       </div>
     );
