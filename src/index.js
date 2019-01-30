@@ -25,7 +25,7 @@ class Board extends React.Component {
 
 // Template for creating board using 2 loops
 // c - cols, r - rows
-  createRows() {
+  createBoard() {
   	let cols = [];
   	for(let c = 0; c < 3; c++){
   		let rows = [];
@@ -48,7 +48,7 @@ class Board extends React.Component {
 
   render() {
     return (
-      this.createRows()
+      this.createBoard()
     );
   }
 }
@@ -113,10 +113,32 @@ class Game extends React.Component {
   }
 
   render() {
-  	const history = this.state.history;
+  	let history = this.state.history;
   	const current = history[this.state.stepNumber];
   	const winner  = calculateWinner(current.squares);
   	const positions = current.positions;
+
+
+  	// this changes the variable history
+  	// but if I try to change this.state.history
+  	// crashes, because history.positions.length =  9
+  	// And if its reversed, retrieving positions[0].col
+  	// will throw an error, overall looks good, my first
+  	// task was not solved fully, and was not solved correctly
+  	if(!this.state.ascending){
+  		history = history.slice().reverse();
+  		console.log(history);
+  	}
+  	else
+  		console.log(history);
+
+  	// POTENTIAL SOLUTION: dont make positions of certain length
+  	// so when reversing, we wont be trying to get null of undefined
+  	// or make pulling information different, i.e dont do positions[move-1].col
+
+  	// I think positions needs to stay with history,
+  	// easier for updating when time travelling
+
   	const moves = history.map((step, move) => {
   		let col, row;
   		// using jumped from state, so that the app doesn't crash
@@ -134,7 +156,7 @@ class Game extends React.Component {
   			'Go to move #' + move + " at (" + col + "," + row + ")" :
   			'Go to game start';
   			return (
-  				<li key={move}>
+  				<li key={move.toString()}>
   					<button id={move} onClick={() => this.jumpTo(move)}>{desc}</button>
   				</li>
   			);
@@ -162,7 +184,7 @@ class Game extends React.Component {
           <div>{status}</div>
           <ol>{moves}</ol>
           <button onClick={() => this.setState({ascending: !this.state.ascending,})}>
-          	Change order
+          	Ascending order: {this.state.ascending.toString()}
           </button>
         </div>
       </div>
