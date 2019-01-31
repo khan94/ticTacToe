@@ -64,7 +64,7 @@ class Game extends React.Component {
 			stepNumber: 0,
 			xIsNext: true,
 			positions: [],
-			jumped: false,
+			jumped: false, // used as mediator, between choosing a move, and creating new timeline, for positions
 			ascending: true,
 		}
 	}
@@ -73,18 +73,16 @@ class Game extends React.Component {
   	const history = this.state.history.slice(0, this.state.stepNumber + 1);
   	const current = history[history.length - 1];
   	const squares = current.squares.slice();
-  	// const positions = current.positions.slice();
   	let positions = this.state.positions;
   	if(calculateWinner(squares) || squares[i]) {
   		return;
   	}
   	squares[i] = this.state.xIsNext ? 'X' : 'O';
+  	// some arithmetics to convert i into col,row
   	let col = (i % 3) + 1;
   	let row = Math.ceil((i+1.0)/3);
   	let pos = {col: col,
   						 row: row};
-  	// positions[history.length - 1] = {col: col,
-  	// 								row: row,};
   	this.setState({
   		history: history.concat([{
   			squares: squares,
@@ -102,7 +100,6 @@ class Game extends React.Component {
  			positions: positions,
  			jumped: false,
  		});
- 		console.warn(this.state.positions.length);
    	
    	const length = this.state.history.length;
   	for(let i = 0; i < length; i++){
@@ -149,19 +146,22 @@ class Game extends React.Component {
 
   	// I think positions needs to stay with history,
   	// easier for updating when time travelling
-
+  	console.log("history length: " + history.length);
+  	const length = history.length;
   	const moves = history.map((step, move) => {
   		let col, row;
-  		// using jumped from state, so that the app doesn't crash
-  		// when time travelling, as I haven't fixed bug
-  		// of showing proper (col, row) after timetravel
-
+  		if(!this.state.ascending){
+  			// change move
+  			move = length - move - 1;
+  		}
   		//or have a another if statement to check if ascending or not
   		//to retrieve the positions[i] properly
   		if(move) {
-  			console.warn("crashes at move: " + move);
 	  		col = positions[move - 1].col;
 	  		row = positions[move - 1].row;
+	  	}
+	  	else if(move && !this.state.ascending){
+	  		// retrieve col and row differently?
 	  	}
 	  	else{
 	  		col = 0;
