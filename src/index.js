@@ -63,6 +63,7 @@ class Game extends React.Component {
 			}],
 			stepNumber: 0,
 			xIsNext: true,
+			positions: [],
 			jumped: false,
 			ascending: true,
 		}
@@ -72,19 +73,18 @@ class Game extends React.Component {
   	const history = this.state.history.slice(0, this.state.stepNumber + 1);
   	const current = history[history.length - 1];
   	const squares = current.squares.slice();
-  	const positions = current.positions.slice();
+  	// const positions = current.positions.slice();
+  	let positions = this.state.positions;
   	if(calculateWinner(squares) || squares[i]) {
   		return;
   	}
   	squares[i] = this.state.xIsNext ? 'X' : 'O';
   	let col = (i % 3) + 1;
   	let row = Math.ceil((i+1.0)/3);
-  	console.log("TEST: col: " + col + " and row: " + row);
-  	positions[history.length - 1] = {col: col,
-  									row: row,};
-  	console.log("History Length: " + history.length);
-  	console.log("Col: " + positions[history.length - 1].col);
-  	console.log("Row: " + positions[history.length - 1].row);
+  	let pos = {col: col,
+  						 row: row};
+  	// positions[history.length - 1] = {col: col,
+  	// 								row: row,};
   	this.setState({
   		history: history.concat([{
   			squares: squares,
@@ -93,6 +93,17 @@ class Game extends React.Component {
   		stepNumber: history.length,
   		xIsNext: !this.state.xIsNext,
    	});
+   	if(this.state.jumped){
+   		console.warn("test to see if jumped");
+   		positions = positions.slice(0, this.state.stepNumber);
+   	}
+   	positions.push(pos);
+ 	 	this.setState({
+ 			positions: positions,
+ 			jumped: false,
+ 		});
+ 		console.warn(this.state.positions.length);
+   	
    	const length = this.state.history.length;
   	for(let i = 0; i < length; i++){
   		document.getElementById(i).style.fontWeight = "normal";
@@ -116,7 +127,7 @@ class Game extends React.Component {
   	let history = this.state.history;
   	const current = history[this.state.stepNumber];
   	const winner  = calculateWinner(current.squares);
-  	const positions = current.positions;
+  	const positions = this.state.positions;
 
 
   	// this changes the variable history
@@ -125,12 +136,12 @@ class Game extends React.Component {
   	// And if its reversed, retrieving positions[0].col
   	// will throw an error, overall looks good, my first
   	// task was not solved fully, and was not solved correctly
-  	if(!this.state.ascending){
-  		history = history.slice().reverse();
-  		console.log(history);
-  	}
-  	else
-  		console.log(history);
+  	// if(!this.state.ascending){
+  	// 	history = history.slice().reverse();
+  	// 	console.log(history);
+  	// }
+  	// else
+  	// 	console.log(history);
 
   	// POTENTIAL SOLUTION: dont make positions of certain length
   	// so when reversing, we wont be trying to get null of undefined
@@ -144,7 +155,11 @@ class Game extends React.Component {
   		// using jumped from state, so that the app doesn't crash
   		// when time travelling, as I haven't fixed bug
   		// of showing proper (col, row) after timetravel
-  		if(move && !this.state.jumped) {
+
+  		//or have a another if statement to check if ascending or not
+  		//to retrieve the positions[i] properly
+  		if(move) {
+  			console.warn("crashes at move: " + move);
 	  		col = positions[move - 1].col;
 	  		row = positions[move - 1].row;
 	  	}
