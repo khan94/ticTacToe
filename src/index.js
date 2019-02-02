@@ -19,6 +19,7 @@ class Board extends React.Component {
     		value={this.props.squares[i]}
     		onClick={() => this.props.onClick(i)}
     		key={i}
+    		id={i}
     	/>
     );
   }
@@ -63,9 +64,9 @@ class Game extends React.Component {
 			}],
 			stepNumber: 0,
 			xIsNext: true,
-			positions: [],
+			positions: [], // holds a history of (row, col) for moves
 			jumped: false, // used as mediator, between choosing a move, and creating new timeline, for positions
-			ascending: true,
+			ascending: true, // to track order to display moves
 		}
 	}
 
@@ -74,7 +75,8 @@ class Game extends React.Component {
   	const current = history[history.length - 1];
   	const squares = current.squares.slice();
   	let positions = this.state.positions;
-  	if(calculateWinner(squares) || squares[i]) {
+  	const calcWin = calculateWinner(squares);
+  	if(calcWin || squares[i]) {
   		return;
   	}
   	squares[i] = this.state.xIsNext ? 'X' : 'O';
@@ -92,7 +94,6 @@ class Game extends React.Component {
   		xIsNext: !this.state.xIsNext,
    	});
    	if(this.state.jumped){
-   		console.warn("test to see if jumped");
    		positions = positions.slice(0, this.state.stepNumber);
    	}
    	positions.push(pos);
@@ -102,8 +103,8 @@ class Game extends React.Component {
  		});
    	
    	const length = this.state.history.length;
-  	for(let i = 0; i < length; i++){
-  		document.getElementById(i).style.fontWeight = "normal";
+  	for(let j = 0; j < length; j++){
+  		document.getElementById(j).style.fontWeight = "normal";
   	}
   }
 
@@ -123,45 +124,19 @@ class Game extends React.Component {
   render() {
   	let history = this.state.history;
   	const current = history[this.state.stepNumber];
-  	const winner  = calculateWinner(current.squares);
+  	const calcWin = calculateWinner(current.squares);
   	const positions = this.state.positions;
-
-
-  	// this changes the variable history
-  	// but if I try to change this.state.history
-  	// crashes, because history.positions.length =  9
-  	// And if its reversed, retrieving positions[0].col
-  	// will throw an error, overall looks good, my first
-  	// task was not solved fully, and was not solved correctly
-  	// if(!this.state.ascending){
-  	// 	history = history.slice().reverse();
-  	// 	console.log(history);
-  	// }
-  	// else
-  	// 	console.log(history);
-
-  	// POTENTIAL SOLUTION: dont make positions of certain length
-  	// so when reversing, we wont be trying to get null of undefined
-  	// or make pulling information different, i.e dont do positions[move-1].col
-
-  	// I think positions needs to stay with history,
-  	// easier for updating when time travelling
-  	console.log("history length: " + history.length);
   	const length = history.length;
+
   	const moves = history.map((step, move) => {
   		let col, row;
+  		// change move if order is different
   		if(!this.state.ascending){
-  			// change move
   			move = length - move - 1;
   		}
-  		//or have a another if statement to check if ascending or not
-  		//to retrieve the positions[i] properly
   		if(move) {
 	  		col = positions[move - 1].col;
 	  		row = positions[move - 1].row;
-	  	}
-	  	else if(move && !this.state.ascending){
-	  		// retrieve col and row differently?
 	  	}
 	  	else{
 	  		col = 0;
@@ -179,14 +154,25 @@ class Game extends React.Component {
   	});
 
   	let status;
-  	if(winner) {
-    	status = 'Winner: ' + winner;
+  	let lines;
+  	if(calcWin) {
+    	status = 'Winner: ' + calcWin.winner;
+    	// highlight the right boxes
+    	lines = calcWin.lines;
+    	for(let i = 0; i < lines.length; i++){
+    		// use #E3D75C for background
+    		// document.getElementById(lines[i]).style.background = "#e3d75c";
+    		// throws an error, cant read proprty style of null
+    		// when using get elementById, refers to moves, not squares
+    		console.log("test: " + lines[i]);
+    		// POTENTIAL SOLUTION: pass calcWin as prop to  Board
+    		// In Board, check if calcWin is not null
+    		// if not null get lines and set square colors to #e3d75c
+    	}
     }
     else {
     	status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
-
-
     return (
       <div className="game">
         <div className="game-board">
@@ -207,6 +193,9 @@ class Game extends React.Component {
   }
 }
 
+// instead of only returning squares[a]
+// we could return an object of squares[a] and lines[i]
+// use lines[i] to color the boxes that caused a win
 function calculateWinner(squares) {
 	const lines = [
 		[0, 1, 2],
@@ -225,7 +214,10 @@ function calculateWinner(squares) {
 				squares[a] === squares[b] &&
 				squares[a] === squares[c])
 		{
-			return squares[a];
+			return {
+				winner: squares[a],
+				lines: lines[i]
+			};
 		}
 	}
 	return null;
