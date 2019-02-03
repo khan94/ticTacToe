@@ -154,7 +154,6 @@ class Game extends React.Component {
 
   	let status;
   	let lines;
-  	console.log("stepNumber: " + this.state.stepNumber);
   	if(calcWin) {
     	status = 'Winner: ' + calcWin.winner;
     	// highlight the right boxes
