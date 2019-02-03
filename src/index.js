@@ -12,14 +12,13 @@ function Square(props){
 }
 
 class Board extends React.Component {
-  
   renderSquare(i) {
     return (
     	<Square 
     		value={this.props.squares[i]}
     		onClick={() => this.props.onClick(i)}
     		key={i}
-    		id={i}
+    		id={i*11}
     	/>
     );
   }
@@ -28,11 +27,12 @@ class Board extends React.Component {
 // c - cols, r - rows
   createBoard() {
   	let cols = [];
+  	let i;
   	for(let c = 0; c < 3; c++){
   		let rows = [];
   		for(let r = 0; r < 3; r++){
   			// i - used for renderSquare function
-  			let i = 3*c + r;
+  			i = 3*c + r;
   			rows.push(this.renderSquare(i));
   		}
   		cols.push(rows);
@@ -60,7 +60,6 @@ class Game extends React.Component {
 		this.state = {
 			history: [{
 				squares: Array(9).fill(null),
-				positions: Array(9).fill(null),
 			}],
 			stepNumber: 0,
 			xIsNext: true,
@@ -155,6 +154,7 @@ class Game extends React.Component {
 
   	let status;
   	let lines;
+  	console.log("stepNumber: " + this.state.stepNumber);
   	if(calcWin) {
     	status = 'Winner: ' + calcWin.winner;
     	// highlight the right boxes
@@ -165,10 +165,10 @@ class Game extends React.Component {
     		// throws an error, cant read proprty style of null
     		// when using get elementById, refers to moves, not squares
     		console.log("test: " + lines[i]);
-    		// POTENTIAL SOLUTION: pass calcWin as prop to  Board
-    		// In Board, check if calcWin is not null
-    		// if not null get lines and set square colors to #e3d75c
     	}
+    }
+    else if(this.state.stepNumber === 9){
+    	status = 'Its a DRAW';
     }
     else {
     	status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
@@ -178,6 +178,7 @@ class Game extends React.Component {
         <div className="game-board">
           <Board 
           	squares={current.squares}
+          	calcWin={calcWin}
           	onClick={(i) => this.handleClick(i)}
           />
         </div>
